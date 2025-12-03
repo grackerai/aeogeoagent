@@ -1,13 +1,3 @@
-report_weather_task:
-  description: >
-    Get the current temperature for {location}.
-    Use the WeatherTool to fetch the weather information.
-    Present the temperature in a clear and concise format.
-  expected_output: >
-    A brief, friendly report containing the current temperature for {location}.
-    Include the location name and temperature in the output.
-  agent: weather_reporter
-
 fetch_gsc_keywords_task:
   description: >
     Connect to Google Search Console for the domain {domain} and fetch the top {num_keywords} keywords

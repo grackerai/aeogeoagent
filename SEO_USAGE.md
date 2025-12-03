@@ -23,12 +23,12 @@ The SEO agent analyzes Google Search Console data and verifies keyword rankings 
 2. Click "Create Credentials" → "OAuth client ID"
 3. If prompted, configure the OAuth consent screen:
    - User Type: External
-   - App name: "Weather Crew SEO"
+   - App name: "Multi-Agent Crew SEO"
    - Add your email
    - Save and continue through all steps
 4. Create OAuth client ID:
    - Application type: **Desktop app**
-   - Name: "Weather Crew"
+   - Name: "Multi-Agent Crew"
    - Click "Create"
 5. Download the JSON file
 6. Rename it to `credentials.json`
@@ -100,13 +100,13 @@ cd multi_agent_crew/src
 === SEO ANALYSIS REPORT ===
 
 Top Keywords from Google Search Console:
-1. "best weather app" - 1,234 clicks, 45,678 impressions, 2.7% CTR, Position 3.2
-2. "weather forecast api" - 987 clicks, 23,456 impressions, 4.2% CTR, Position 2.1
+1. "best seo tools" - 1,234 clicks, 45,678 impressions, 2.7% CTR, Position 3.2
+2. "keyword research api" - 987 clicks, 23,456 impressions, 4.2% CTR, Position 2.1
 ...
 
 Keyword Ranking Verification:
-✓ "best weather app" - FOUND in search results
-✗ "weather forecast api" - NOT FOUND in search results
+✓ "best seo tools" - FOUND in search results
+✗ "keyword research api" - NOT FOUND in search results
 ...
 
 Summary:
@@ -115,14 +115,12 @@ Summary:
 - Not found: 3 (30%)
 
 Recommendations:
-- Focus on improving content for: "weather forecast api", "real-time weather", "climate data"
+- Focus on improving content for: "keyword research api", "seo analytics", "search optimization"
 ```
 
 ---
 
-## Running Only SEO Tasks
-
-If you want to run ONLY the SEO analysis (not weather), you can modify `main.py` or create a separate command.
+## Advanced Usage
 
 ### Option 1: Modify Crew to Run Specific Tasks
 
@@ -136,7 +134,7 @@ def run_seo_only():
         'num_keywords': 10
     }
     
-    crew_instance = WeatherCrew()
+    crew_instance = SEOCrew()
     
     # Run only SEO tasks
     seo_agent = crew_instance.seo_analyst()
@@ -155,9 +153,9 @@ def run_seo_only():
     return result
 ```
 
-### Option 2: Use Task Filtering
+### Task Configuration
 
-CrewAI will automatically skip tasks that don't have their input variables provided. So if you only provide `domain`, `company_name`, and `num_keywords` (not `location`), only the SEO tasks will run.
+The SEO crew is designed to run SEO analysis tasks. All tasks are configured in `config/tasks.yaml` and use the SEO analyst agent.
 
 ---
 

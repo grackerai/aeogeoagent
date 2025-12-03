@@ -8,12 +8,12 @@ from ...core.config import settings
 class SEOTasks:
     """Tasks for SEO analysis."""
     
-    def fetch_keywords(self, agent, domain: str, num_keywords: int) -> Task:
+    def fetch_keywords(self, agent, domain: str, num_keywords: int, date_range: int = 30, sort_by: str = "clicks") -> Task:
         """Task to fetch keywords from GSC."""
         return Task(
             description=f"""
                 Connect to Google Search Console for the domain {domain} and fetch the top {num_keywords} keywords
-                by clicks and impressions from the last 30 days. Use the GSCTool to retrieve this data.
+                sorted by {sort_by} from the last {date_range} days. Use the GSCTool to retrieve this data.
                 Present the keywords with their performance metrics in a clear, organized format.
             """,
             expected_output=f"""
@@ -28,17 +28,29 @@ class SEOTasks:
         """Task to verify keyword rankings."""
         return Task(
             description=f"""
-                For each keyword retrieved from Google Search Console, use the KeywordSearchTool to search
-                for that keyword and verify if {domain} or {company_name} appears in the search results.
-                Use GPT-4o-mini to simulate search results and check for presence.
-                Provide a clear found/not found status for each keyword.
+                For each keyword retrieved from Google Search Console, use the KeywordSearchTool to verify 
+                if {domain} or {company_name} appears in search results.
+                
+                The KeywordSearchTool uses 4 AI models in parallel (OpenAI, Gemini, Grok, DeepSeek).
+                For EACH keyword, you MUST show the results from ALL 4 models.
             """,
             expected_output=f"""
-                A comprehensive report showing:
-                1. Each keyword from GSC
-                2. Whether {domain} or {company_name} was found in search results (✓ Found / ✗ Not Found)
-                3. A summary with total keywords analyzed and visibility percentage
-                4. Recommendations for keywords where the domain was not found
+                Create a markdown table report with the following structure:
+                
+                ## Keyword Ranking Verification Report
+                
+                | Keyword | OpenAI | Gemini | Grok | DeepSeek | Consensus | Vote |
+                |---------|--------|--------|------|----------|-----------|------|
+                | keyword1 | ✓ | ✗ | ✓ | ✓ | Found | 3/4 |
+                | keyword2 | ✗ | ✗ | ✗ | ✗ | Not Found | 0/4 |
+                
+                ### Summary
+                - Total Keywords: X
+                - Found: Y (Z%)
+                - Not Found: W
+                
+                ### Recommendations
+                List specific actions for keywords not found.
             """,
             agent=agent,
             context=context_tasks or []

@@ -1,6 +1,6 @@
 # Multi-Agent Crew System
 
-A production-ready, scalable multi-agent system built with CrewAI, featuring specialized agents for weather reporting and SEO analysis.
+A production-ready, scalable multi-agent system built with CrewAI, featuring specialized agents for SEO analysis.
 
 ## 🌟 Features
 
@@ -34,9 +34,6 @@ PROMETHEUS_PORT=8000
 ### 3. Run the CLI
 
 ```bash
-# Get Weather
-multi_agent_crew weather --location "London"
-
 # Analyze SEO
 multi_agent_crew seo --domain "example.com" --company-name "Example Inc"
 ```
@@ -45,7 +42,7 @@ multi_agent_crew seo --domain "example.com" --company-name "Example Inc"
 
 The system follows a modular architecture designed for scalability:
 
-- **Agents**: Specialized workers (Weather, SEO) created via Factory
+- **Agents**: Specialized workers (SEO) created via Factory
 - **Tools**: Reusable capabilities with built-in caching
 - **Crews**: Composable workflows
 - **Observability**: Pluggable backends (Prometheus, Logs)

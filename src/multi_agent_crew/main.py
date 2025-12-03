@@ -7,7 +7,7 @@ import typer
 from rich.console import Console
 from rich.logging import RichHandler
 
-from .crews import WeatherCrew, SEOCrew
+from .crews import SEOCrew
 from .core.observability import get_observability, ObservabilityFactory
 from .core.config import settings
 
@@ -21,7 +21,7 @@ logging.basicConfig(
 
 app = typer.Typer(
     name="multi_agent_crew",
-    help="Multi-Agent Crew CLI for Weather and SEO Analysis",
+    help="Multi-Agent Crew CLI for SEO Analysis",
     add_completion=False,
 )
 console = Console()
@@ -48,29 +48,12 @@ def main(
 
 
 @app.command()
-def weather(
-    location: str = typer.Option(..., "--location", "-l", help="Location to get weather for"),
-):
-    """
-    Run the Weather Crew to get the current temperature.
-    """
-    console.print(f"[bold blue]Starting Weather Crew for {location}...[/bold blue]")
-    
-    try:
-        crew = WeatherCrew()
-        result = crew.run(inputs={"location": location})
-        console.print(f"\n[bold green]Result:[/bold green]\n{result}")
-        
-    except Exception as e:
-        console.print(f"[bold red]Error:[/bold red] {str(e)}")
-        sys.exit(1)
-
-
-@app.command()
 def seo(
     domain: str = typer.Option(..., "--domain", "-d", help="Domain to analyze"),
     company_name: str = typer.Option(..., "--company-name", "-c", help="Company name to verify"),
-    num_keywords: int = typer.Option(10, "--num-keywords", "-n", help="Number of keywords to fetch"),
+    num_keywords: int = typer.Option(10, "--num-keywords", "-n", help="Number of keywords to fetch (default: 10)"),
+    date_range: int = typer.Option(30, "--date-range", "-r", help="Days to look back (default: 30)"),
+    sort_by: str = typer.Option("clicks", "--sort-by", "-s", help="Sort by: clicks, impressions, ctr, position (default: clicks)"),
 ):
     """
     Run the SEO Crew to analyze keywords and rankings.
@@ -82,7 +65,9 @@ def seo(
         result = crew.run(inputs={
             "domain": domain,
             "company_name": company_name,
-            "num_keywords": num_keywords
+            "num_keywords": num_keywords,
+            "date_range": date_range,
+            "sort_by": sort_by
         })
         console.print(f"\n[bold green]Result:[/bold green]\n{result}")
         

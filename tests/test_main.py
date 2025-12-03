@@ -6,22 +6,6 @@ from multi_agent_crew.main import app
 
 runner = CliRunner()
 
-@patch('multi_agent_crew.main.WeatherCrew')
-def test_weather_command(mock_weather_crew):
-    """Test the weather command."""
-    # Mock crew execution
-    mock_instance = MagicMock()
-    mock_instance.run.return_value = "Sunny in London"
-    mock_weather_crew.return_value = mock_instance
-    
-    result = runner.invoke(app, ["weather", "--location", "London"])
-    
-    assert result.exit_code == 0
-    assert "Starting Weather Crew for London" in result.stdout
-    assert "Sunny in London" in result.stdout
-    mock_weather_crew.assert_called_once()
-    mock_instance.run.assert_called_with(inputs={"location": "London"})
-
 
 @patch('multi_agent_crew.main.SEOCrew')
 def test_seo_command(mock_seo_crew):

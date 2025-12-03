@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     # LLM Configuration
     openrouter_api_key: Optional[str] = Field(None, description="OpenRouter API Key")
     openai_api_key: Optional[str] = Field(None, description="OpenAI API Key")
-    default_llm_model: str = Field("openrouter/google/gemini-2.0-flash-exp:free", description="Default LLM model")
+    default_llm_model: str = Field("openrouter/google/gemini-2.5-flash-lite", description="Default LLM model")
     
     # Google Search Console
     gsc_credentials_path: str = Field("credentials.json", description="Path to GSC credentials")

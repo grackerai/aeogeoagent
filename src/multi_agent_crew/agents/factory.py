@@ -4,7 +4,6 @@ from typing import Dict, Type, Optional
 from crewai import Agent
 
 from .base import BaseAgent
-from .weather_agent import WeatherAgent
 from .seo_agent import SEOAgent
 from ..core.exceptions import AgentError
 from ..core.observability import get_observability
@@ -14,7 +13,6 @@ class AgentFactory:
     """Factory for creating agents."""
     
     _agents: Dict[str, Type[BaseAgent]] = {
-        "weather": WeatherAgent,
         "seo": SEOAgent,
     }
     
@@ -24,7 +22,7 @@ class AgentFactory:
         Create an agent instance.
         
         Args:
-            agent_type: Type of agent to create (weather, seo)
+            agent_type: Type of agent to create (seo)
             **kwargs: Configuration for the agent
             
         Returns:

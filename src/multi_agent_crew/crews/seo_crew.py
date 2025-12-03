@@ -16,7 +16,13 @@ class SEOCrew(BaseCrew):
         seo_agent = AgentFactory.create("seo")
         tasks = SEOTasks()
         
-        fetch_task = tasks.fetch_keywords(seo_agent, "{domain}", "{num_keywords}")
+        fetch_task = tasks.fetch_keywords(
+            seo_agent, 
+            "{domain}", 
+            "{num_keywords}",
+            "{date_range}",
+            "{sort_by}"
+        )
         verify_task = tasks.verify_rankings(seo_agent, "{domain}", "{company_name}", [fetch_task])
         
         return Crew(

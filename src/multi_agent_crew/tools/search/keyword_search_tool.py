@@ -1,8 +1,9 @@
-"""Keyword search tool implementation."""
+"""Keyword search tool implementation with multi-model parallel search."""
 
 import os
 import json
-from typing import Type
+import asyncio
+from typing import Type, List, Dict, ClassVar
 from pydantic import BaseModel, Field
 
 from ..base.cached_tool import CachedTool
@@ -19,36 +20,26 @@ class KeywordSearchToolInput(BaseModel):
 class KeywordSearchTool(CachedTool):
     name: str = "KeywordSearchTool"
     description: str = (
-        "A tool that uses GPT-4o-mini to search for a keyword and check if a specific "
-        "domain or company name appears in the search results. Returns found/not found status."
+        "A tool that uses multiple AI models in parallel to search for a keyword and check if a specific "
+        "domain or company name appears in the search results. Returns aggregated results from all models."
     )
     args_schema: Type[BaseModel] = KeywordSearchToolInput
+    
+    # Models to search with in parallel
+    SEARCH_MODELS: ClassVar[List[str]] = [
+        "openai/gpt-4o-mini",
+        "google/gemini-2.5-flash-lite",
+        "x-ai/grok-beta",
+        "deepseek/deepseek-chat"
+    ]
 
     def _run(self, keyword: str, target_domain: str) -> str:
         """Search for keyword and verify if target domain/company appears."""
         return self._run_with_observability(self._search_keyword, keyword, target_domain)
 
-    def _search_keyword(self, keyword: str, target_domain: str) -> str:
-        """Internal method to search keyword."""
+    async def _search_single_model(self, client, model: str, keyword: str, target_domain: str) -> Dict:
+        """Search with a single model asynchronously."""
         try:
-            import openai
-            
-            # Get API key
-            api_key = settings.openrouter_api_key or settings.openai_api_key
-            if not api_key:
-                raise ToolError("No API key found. Set OPENROUTER_API_KEY or OPENAI_API_KEY.")
-            
-            # Configure client
-            if settings.openrouter_api_key:
-                client = openai.OpenAI(
-                    base_url="https://openrouter.ai/api/v1",
-                    api_key=api_key
-                )
-                model = "openai/gpt-4o-mini"
-            else:
-                client = openai.OpenAI(api_key=api_key)
-                model = "gpt-4o-mini"
-            
             prompt = f"""You are a search engine. When someone searches for "{keyword}", what are the top 5 results?
 
 For each result, provide:
@@ -57,7 +48,8 @@ For each result, provide:
 
 Format your response as a numbered list. Be realistic about what would actually appear in search results for this keyword."""
             
-            response = client.chat.completions.create(
+            response = await asyncio.to_thread(
+                client.chat.completions.create,
                 model=model,
                 messages=[
                     {"role": "system", "content": "You are a helpful search engine that provides realistic search results."},
@@ -80,13 +72,66 @@ Format your response as a numbered list. Be realistic about what would actually 
                 target_lower in results_lower
             )
             
+            return {
+                "model": model,
+                "found": found,
+                "search_results": search_results
+            }
+            
+        except Exception as model_error:
+            return {
+                "model": model,
+                "found": False,
+                "error": str(model_error)
+            }
+
+    def _search_keyword(self, keyword: str, target_domain: str) -> str:
+        """Internal method to search keyword using multiple models in parallel."""
+        try:
+            import openai
+            
+            # Get API key
+            api_key = settings.openrouter_api_key or settings.openai_api_key
+            if not api_key:
+                raise ToolError("No API key found. Set OPENROUTER_API_KEY or OPENAI_API_KEY.")
+            
+            # Use OpenRouter for multi-model access
+            if settings.openrouter_api_key:
+                client = openai.OpenAI(
+                    base_url="https://openrouter.ai/api/v1",
+                    api_key=api_key
+                )
+                models = self.SEARCH_MODELS
+            else:
+                # Fallback to OpenAI only
+                client = openai.OpenAI(api_key=api_key)
+                models = ["gpt-4o-mini"]
+            
+            # Run all model searches in parallel using asyncio
+            async def search_all_models():
+                tasks = [
+                    self._search_single_model(client, model, keyword, target_domain)
+                    for model in models
+                ]
+                return await asyncio.gather(*tasks)
+            
+            # Execute parallel searches
+            results = asyncio.run(search_all_models())
+            
+            # Aggregate results
+            total_models = len(results)
+            found_count = sum(1 for r in results if r.get("found", False))
+            consensus = found_count > (total_models / 2)  # Majority vote
+            
             return json.dumps({
                 "status": "success",
                 "keyword": keyword,
                 "target": target_domain,
-                "found": found,
-                "search_results": search_results
-            })
+                "consensus_found": consensus,
+                "found_in_models": found_count,
+                "total_models": total_models,
+                "model_results": results
+            }, indent=2)
             
         except ImportError:
             raise ToolError("OpenAI library not installed.")
