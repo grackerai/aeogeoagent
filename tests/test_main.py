@@ -1,48 +1,49 @@
-"""Unit tests for main module."""
+"""Unit tests for the CLI."""
 
-import pytest
-from unittest.mock import patch, Mock
-from multi_agent_crew.main import run
+from typer.testing import CliRunner
+from unittest.mock import patch, MagicMock
+from multi_agent_crew.main import app
 
+runner = CliRunner()
 
-class TestMain:
-    """Test suite for main module."""
+@patch('multi_agent_crew.main.WeatherCrew')
+def test_weather_command(mock_weather_crew):
+    """Test the weather command."""
+    # Mock crew execution
+    mock_instance = MagicMock()
+    mock_instance.run.return_value = "Sunny in London"
+    mock_weather_crew.return_value = mock_instance
     
-    @patch('multi_agent_crew.main.WeatherCrew')
-    @patch('sys.argv', ['multi_agent_crew', '--location', 'Tokyo'])
-    def test_run_with_custom_location(self, mock_crew_class):
-        """Test running crew with custom location."""
-        # Mock crew and result
-        mock_crew_instance = Mock()
-        mock_result = Mock()
-        mock_result.raw = "Tokyo: ☁️  +20°C"
-        mock_crew_instance.crew().kickoff.return_value = mock_result
-        mock_crew_class.return_value = mock_crew_instance
-        
-        result = run()
-        
-        assert result == "Tokyo: ☁️  +20°C"
-        mock_crew_instance.crew().kickoff.assert_called_once()
-        
-        # Check that Tokyo was passed as input
-        call_args = mock_crew_instance.crew().kickoff.call_args
-        assert call_args[1]['inputs']['location'] == 'Tokyo'
+    result = runner.invoke(app, ["weather", "--location", "London"])
     
-    @patch('multi_agent_crew.main.WeatherCrew')
-    @patch('sys.argv', ['multi_agent_crew'])
-    def test_run_with_default_location(self, mock_crew_class):
-        """Test running crew with default location (London)."""
-        # Mock crew and result
-        mock_crew_instance = Mock()
-        mock_result = Mock()
-        mock_result.raw = "London: 🌧  +10°C"
-        mock_crew_instance.crew().kickoff.return_value = mock_result
-        mock_crew_class.return_value = mock_crew_instance
-        
-        result = run()
-        
-        assert result == "London: 🌧  +10°C"
-        
-        # Check that London was passed as input (default)
-        call_args = mock_crew_instance.crew().kickoff.call_args
-        assert call_args[1]['inputs']['location'] == 'London'
+    assert result.exit_code == 0
+    assert "Starting Weather Crew for London" in result.stdout
+    assert "Sunny in London" in result.stdout
+    mock_weather_crew.assert_called_once()
+    mock_instance.run.assert_called_with(inputs={"location": "London"})
+
+
+@patch('multi_agent_crew.main.SEOCrew')
+def test_seo_command(mock_seo_crew):
+    """Test the seo command."""
+    # Mock crew execution
+    mock_instance = MagicMock()
+    mock_instance.run.return_value = "SEO Report"
+    mock_seo_crew.return_value = mock_instance
+    
+    result = runner.invoke(app, [
+        "seo", 
+        "--domain", "example.com", 
+        "--company-name", "Example",
+        "--num-keywords", "5"
+    ])
+    
+    assert result.exit_code == 0
+    assert "Starting SEO Crew for example.com" in result.stdout
+    assert "SEO Report" in result.stdout
+    mock_seo_crew.assert_called_once()
+    mock_instance.run.assert_called_with(inputs={
+        "domain": "example.com",
+        "company_name": "Example",
+        "num_keywords": 5
+    })
