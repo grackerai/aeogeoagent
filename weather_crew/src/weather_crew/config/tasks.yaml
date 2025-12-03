@@ -1,0 +1,36 @@
+report_weather_task:
+  description: >
+    Get the current temperature for {location}.
+    Use the WeatherTool to fetch the weather information.
+    Present the temperature in a clear and concise format.
+  expected_output: >
+    A brief, friendly report containing the current temperature for {location}.
+    Include the location name and temperature in the output.
+  agent: weather_reporter
+
+fetch_gsc_keywords_task:
+  description: >
+    Connect to Google Search Console for the domain {domain} and fetch the top {num_keywords} keywords
+    by clicks and impressions from the last 30 days. Use the GSCTool to retrieve this data.
+    Present the keywords with their performance metrics in a clear, organized format.
+  expected_output: >
+    A structured list of the top {num_keywords} keywords with their metrics including:
+    keyword name, clicks, impressions, CTR (%), and average position.
+    If no data is available, explain why.
+  agent: seo_analyst
+
+verify_keyword_rankings_task:
+  description: >
+    For each keyword retrieved from Google Search Console, use the KeywordSearchTool to search
+    for that keyword and verify if {domain} or {company_name} appears in the search results.
+    Use GPT-4o-mini to simulate search results and check for presence.
+    Provide a clear found/not found status for each keyword.
+  expected_output: >
+    A comprehensive report showing:
+    1. Each keyword from GSC
+    2. Whether {domain} or {company_name} was found in search results (✓ Found / ✗ Not Found)
+    3. A summary with total keywords analyzed and visibility percentage
+    4. Recommendations for keywords where the domain was not found
+  agent: seo_analyst
+  context:
+    - fetch_gsc_keywords_task
