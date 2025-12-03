@@ -1755,6 +1755,42 @@ wheels = [
 ]
 
 [[package]]
+name = "multi-agent-crew"
+version = "0.1.0"
+source = { editable = "." }
+dependencies = [
+    { name = "crewai", extra = ["tools"] },
+    { name = "google-api-python-client" },
+    { name = "google-auth" },
+    { name = "google-auth-httplib2" },
+    { name = "google-auth-oauthlib" },
+    { name = "openai" },
+    { name = "requests" },
+]
+
+[package.optional-dependencies]
+dev = [
+    { name = "pytest" },
+    { name = "pytest-cov" },
+    { name = "pytest-mock" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "crewai", extras = ["tools"], specifier = "==1.6.1" },
+    { name = "google-api-python-client", specifier = ">=2.100.0" },
+    { name = "google-auth", specifier = ">=2.23.0" },
+    { name = "google-auth-httplib2", specifier = ">=0.1.1" },
+    { name = "google-auth-oauthlib", specifier = ">=1.1.0" },
+    { name = "openai", specifier = ">=1.0.0" },
+    { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.4.0" },
+    { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=4.1.0" },
+    { name = "pytest-mock", marker = "extra == 'dev'", specifier = ">=3.11.1" },
+    { name = "requests", specifier = ">=2.31.0" },
+]
+provides-extras = ["dev"]
+
+[[package]]
 name = "multidict"
 version = "6.7.0"
 source = { registry = "https://pypi.org/simple" }
@@ -3812,42 +3848,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/c9/81/e7fe958ce8a7fb5c73cc9fb07f5aeaf755e6aa72498c57d760af760c91f8/watchfiles-1.1.1-pp311-pypy311_pp73-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:ce19e06cbda693e9e7686358af9cd6f5d61312ab8b00488bc36f5aabbaf77e24", size = 450493, upload-time = "2025-10-14T15:06:12.321Z" },
     { url = "https://files.pythonhosted.org/packages/6e/d4/ed38dd3b1767193de971e694aa544356e63353c33a85d948166b5ff58b9e/watchfiles-1.1.1-pp311-pypy311_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:3e6f39af2eab0118338902798b5aa6664f46ff66bc0280de76fca67a7f262a49", size = 457546, upload-time = "2025-10-14T15:06:13.372Z" },
 ]
-
-[[package]]
-name = "weather-crew"
-version = "0.1.0"
-source = { editable = "." }
-dependencies = [
-    { name = "crewai", extra = ["tools"] },
-    { name = "google-api-python-client" },
-    { name = "google-auth" },
-    { name = "google-auth-httplib2" },
-    { name = "google-auth-oauthlib" },
-    { name = "openai" },
-    { name = "requests" },
-]
-
-[package.optional-dependencies]
-dev = [
-    { name = "pytest" },
-    { name = "pytest-cov" },
-    { name = "pytest-mock" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "crewai", extras = ["tools"], specifier = "==1.6.1" },
-    { name = "google-api-python-client", specifier = ">=2.100.0" },
-    { name = "google-auth", specifier = ">=2.23.0" },
-    { name = "google-auth-httplib2", specifier = ">=0.1.1" },
-    { name = "google-auth-oauthlib", specifier = ">=1.1.0" },
-    { name = "openai", specifier = ">=1.0.0" },
-    { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.4.0" },
-    { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=4.1.0" },
-    { name = "pytest-mock", marker = "extra == 'dev'", specifier = ">=3.11.1" },
-    { name = "requests", specifier = ">=2.31.0" },
-]
-provides-extras = ["dev"]
 
 [[package]]
 name = "websocket-client"
